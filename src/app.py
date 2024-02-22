@@ -1,4 +1,5 @@
-import sys
+from load_csv import load_csv
+from bonus import showDataFrame
 
 
 def validInput() -> float:
@@ -13,9 +14,10 @@ def validInput() -> float:
         return validInput()
 
 
-def main(*args, **kwargs):
-    mil = validInput()
-    print("mil", mil)
+def main():
+    # mil = validInput()
+    df = load_csv("data/data.csv")
+    showDataFrame(df)
 
 
 if __name__ == "__main__":
