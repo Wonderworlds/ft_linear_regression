@@ -1,12 +1,14 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import math
 from linearFunction import LinearFunction
 
 
 def showDataFrame(df: pd.DataFrame, lfunc: LinearFunction = None):
+    """Displays the DataFrame as a scatter plot.
 
+    display also the linear function if provided.
+    """
     price = df.loc[:, "price"]
     km = df.loc[:, "km"]
     plt.figure(figsize=(13, 10))
@@ -21,6 +23,7 @@ def showDataFrame(df: pd.DataFrame, lfunc: LinearFunction = None):
             "r",
             linestyle="-",
             linewidth=4,
+            label=f"y = {m}x + {b}",
         )
 
     plt.title(
@@ -45,4 +48,5 @@ def showDataFrame(df: pd.DataFrame, lfunc: LinearFunction = None):
         ),
         fontsize=15,
     )
+    plt.legend(fontsize=15)
     plt.show()

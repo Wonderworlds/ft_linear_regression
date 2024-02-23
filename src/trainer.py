@@ -1,44 +1,73 @@
 import numpy as np
 import pandas as pd
-from load_csv import load_csv
 from bonus import showDataFrame
 from linearFunction import LinearFunction
+import time
 
 
-def estimate_price(km, theta0, theta1):
-    return theta0 + theta1 * km
+class MLgradientDescent:
+    """class containing the model and the methods to train and use it."""
+    theta0: np.float64 = 0
+    theta1: np.float64 = 0
 
+    def __init__(self, path="./data/model.csv") -> None:
+        """Initializes the class."""
+        self.path = path
 
-def train_linear_function(km, price, theta0, theta1, lr):
-    m = len(km)
-    tmp_theta0 = lr * (1 / m) * np.sum(estimate_price(km, theta0, theta1) - price)
-    tmp_theta1 = (
-        lr * (1 / m) * np.sum((estimate_price(km, theta0, theta1) - price) * km)
-    )
-    return [tmp_theta0, tmp_theta1]
+    def save_model(self):
+        """Saves the model to a csv file.
+        """
+        df = pd.DataFrame(
+            {
+                "key": ["theta0", "theta1"],
+                "value": [self.theta0, self.theta1],
+            }
+        )
+        df.to_csv(self.path, index=False, sep=",")
 
+    def load_model(self):
+        """Loads the model from a csv file.
+        """
+        if (self.theta0 != 0) and (self.theta1 != 0):
+            return
+        try:
+            df = pd.read_csv(self.path, index_col=0)
+            self.theta0 = df.loc["theta0", "value"]
+            self.theta1 = df.loc["theta1", "value"]
+        except FileNotFoundError:
+            print("Model not found")
 
-theta0: np.float64 = 0
-theta1: np.float64 = 0
-lr = 0.001
-num_iterations = 100000
+    def estimate_price(self, km: float) -> np.float64:
+        """Estimates the price of a car given its mileage.
 
-df = load_csv("../data/data.csv")
-km = np.asarray(df.loc[:, "km"], np.float64) / 10000
-price = np.asarray(df.loc[:, "price"], np.float64) / 10000
-print("km", km)
-print("price", price)
-for _ in range(num_iterations):
-    tmp = train_linear_function(km, price, theta0, theta1, lr)
-    theta0 -= tmp[0]
-    theta1 -= tmp[1]
+        uses the current theta0 and theta1 to estimate the price.
+        """
+        return self.theta0 + self.theta1 * km
 
-print("theta0", theta0 * 10000)
-print("theta1", theta1)
-# km *= 10000
-# price *= 10000
-# theta1 = (price.max() - price.min()) * (theta1 * 10000) / (km.max() - km.min())
-# theta0 = price.min() + ((price.max() - price.min()) * theta0) + theta1 * (1 - km.min())
-# print("theta0", theta0)
-# print("theta1", theta1)
-showDataFrame(df, LinearFunction(theta1, theta0 * 10000))
+    def gradient_descent(self, km, price, lr):
+        """Performs a gradient descent to update theta0 and theta1."""
+        m = len(km)
+        tmp_theta0 = lr * (1 / m) * np.sum(self.estimate_price(km) - price)
+        tmp_theta1 = lr * (1 / m) * \
+            np.sum((self.estimate_price(km) - price) * km)
+        return [tmp_theta0, tmp_theta1]
+
+    def train_model(self, df: pd.DataFrame):
+        """Trains the model using the gradient descent algorithm."""
+        print("Training model...")
+        tic = time.perf_counter()
+        lr = 0.001
+        num_iterations = 100000
+        km = np.asarray(df.loc[:, "km"], np.float64) / 10000
+        price = np.asarray(df.loc[:, "price"], np.float64) / 10000
+        for _ in range(num_iterations):
+            tmp = self.gradient_descent(km, price, lr)
+            self.theta0 -= tmp[0]
+            self.theta1 -= tmp[1]
+        self.theta0 *= 10000
+        print(f"training time: {time.perf_counter() - tic:0.4f} seconds")
+        self.save_model()
+
+    def show_model(self, df: pd.DataFrame):
+        """Shows the model and the data in a graph."""
+        showDataFrame(df, LinearFunction(self.theta1, self.theta0))
