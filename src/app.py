@@ -46,7 +46,7 @@ def main():
             if choice == 1:
                 mil = validInput()
                 trainer.load_model()
-                estimated_price = trainer.estimate_price(mil).tolist()
+                estimated_price = trainer.estimate_price(mil)
                 print("Estimated price:",
                       estimated_price if estimated_price > 0 else 0)
             elif choice == 2:
