@@ -7,7 +7,7 @@ ENV_VAR_INSTALL := INSTALL_FMAUGUIN_FT_LINEAR_REGRESSION
 
 
 $(NAME):
-	if [ -z $(INSTALL_FMAUGUIN_FT_LINEAR_REGRESSION) ]; then \
+	@if [ ! -d $(VENV_NAME)/bin ]; then \
 		make install; \
 	fi
 	python3 $(SRC)app.py
@@ -24,10 +24,8 @@ install:
 		mkdir -p data; \
 		wget $(DATA_CSV) -O ./data/data.csv; \
 	)
-	@export $(ENV_VAR_INSTALL)=1
 
 uninstall:
-	@unset $(ENV_VAR_INSTALL)
 	rm -rf bin/ include/ lib/ lib64 pyvenv.cfg share/
 
 fclean: uninstall
