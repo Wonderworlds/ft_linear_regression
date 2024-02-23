@@ -1,5 +1,6 @@
 from load_csv import load_csv
 from bonus import showDataFrame
+import sys
 
 
 def validInput() -> float:
