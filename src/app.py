@@ -1,5 +1,6 @@
 from load_csv import load_csv
 from trainer import MLgradientDescent
+import os
 
 
 def validInput() -> float:
@@ -37,6 +38,7 @@ def programChoice() -> int:
 
 def main():
     """main function for the program."""
+    os.system("clear")
     try:
         trainer = MLgradientDescent()
         df = load_csv("data/data.csv")
