@@ -7,6 +7,7 @@ import time
 
 class MLgradientDescent:
     """class containing the model and the methods to train and use it."""
+
     theta0: np.float64 = 0
     theta1: np.float64 = 0
 
@@ -15,8 +16,7 @@ class MLgradientDescent:
         self.path = path
 
     def save_model(self):
-        """Saves the model to a csv file.
-        """
+        """Saves the model to a csv file."""
         df = pd.DataFrame(
             {
                 "key": ["theta0", "theta1"],
@@ -26,8 +26,7 @@ class MLgradientDescent:
         df.to_csv(self.path, index=False, sep=",")
 
     def load_model(self):
-        """Loads the model from a csv file.
-        """
+        """Loads the model from a csv file."""
         if (self.theta0 != 0) and (self.theta1 != 0):
             return
         try:
@@ -48,8 +47,7 @@ class MLgradientDescent:
         """Performs a gradient descent to update theta0 and theta1."""
         m = len(km)
         tmp_theta0 = lr * (1 / m) * np.sum(self.estimate_price(km) - price)
-        tmp_theta1 = lr * (1 / m) * \
-            np.sum((self.estimate_price(km) - price) * km)
+        tmp_theta1 = lr * (1 / m) * np.sum((self.estimate_price(km) - price) * km)
         return [tmp_theta0, tmp_theta1]
 
     def train_model(self, df: pd.DataFrame):
@@ -67,6 +65,13 @@ class MLgradientDescent:
         self.theta0 *= 10000
         print(f"training time: {time.perf_counter() - tic:0.4f} seconds")
         self.save_model()
+
+    def resolveMSE(self, df: pd.DataFrame):
+        """Calculates the Mean Squared Error of the model."""
+        km = np.asarray(df.loc[:, "km"], np.float64)
+        price = np.asarray(df.loc[:, "price"], np.float64)
+        mse = (1 / len(km)) * np.sum((self.estimate_price(km) - price) ** 2)
+        print(f"Mean Squared Error: {mse}")
 
     def show_model(self, df: pd.DataFrame):
         """Shows the model and the data in a graph."""

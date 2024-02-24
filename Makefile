@@ -19,7 +19,7 @@ install:
 	@echo "Creating virtual environment..."
 	( \
 	 	$(PYTHON) -m venv $(VENV_NAME); \
-		source $(VENV_NAME)/bin/activate; \
+		. $(VENV_NAME)/bin/activate; \
 		pip install -r requirements.txt; \
 		mkdir -p data; \
 		wget $(DATA_CSV) -O ./data/data.csv; \
