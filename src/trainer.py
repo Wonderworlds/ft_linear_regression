@@ -47,7 +47,8 @@ class MLgradientDescent:
         """Performs a gradient descent to update theta0 and theta1."""
         m = len(km)
         tmp_theta0 = lr * (1 / m) * np.sum(self.estimate_price(km) - price)
-        tmp_theta1 = lr * (1 / m) * np.sum((self.estimate_price(km) - price) * km)
+        tmp_theta1 = lr * (1 / m) *\
+            np.sum((self.estimate_price(km) - price) * km)
         return [tmp_theta0, tmp_theta1]
 
     def train_model(self, df: pd.DataFrame):
@@ -64,14 +65,40 @@ class MLgradientDescent:
             self.theta1 -= tmp[1]
         self.theta0 *= 10000
         print(f"training time: {time.perf_counter() - tic:0.4f} seconds")
+        self.accuracy_model(df)
         self.save_model()
 
-    def resolveMSE(self, df: pd.DataFrame):
+    def resolveRMSE(self, df: pd.DataFrame):
         """Calculates the Mean Squared Error of the model."""
         km = np.asarray(df.loc[:, "km"], np.float64)
         price = np.asarray(df.loc[:, "price"], np.float64)
-        mse = (1 / len(km)) * np.sum((self.estimate_price(km) - price) ** 2)
-        print(f"Mean Squared Error: {mse}")
+        rmse = ((1 / len(km)) *
+                np.sum((self.estimate_price(km) - price) ** 2)) ** 0.5
+        return rmse
+
+    def resolveMeanLinearFunc(self, df: pd.DataFrame):
+        """Calculate the mean linear function from the dataset"""
+        km = np.asarray(df.loc[:, "km"], np.float64)
+        price = np.asarray(df.loc[:, "price"], np.float64)
+        x_mean = np.mean(km)
+        y_mean = np.mean(price)
+
+        # Calculate slope (m) and y-intercept (b) of the regression line
+        m = np.sum((km - x_mean) * (price - y_mean)) / np.sum((km - x_mean)**2)
+        b = y_mean - m * x_mean
+        return LinearFunction(m, b)
+
+    def accuracy_model(self, df: pd.DataFrame):
+        """print accuracy information"""
+
+        m_lfunc = self.resolveMeanLinearFunc(df)
+        rmse = self.resolveRMSE(df)
+        print("\nAccuracy Info:\n")
+        print(f"My model: y = {self.theta1} * km + {self.theta0}")
+        print(f"mean Lfunc: y = {m_lfunc.m} * km + {m_lfunc.b}")
+        print(f"Root Mean Squared Error: {rmse}")
+        print(f"diff:\tm: {abs(abs(m_lfunc.m) - abs(self.theta1)) * 100} %\
+\n\tb: {abs(abs(m_lfunc.b) - abs(self.theta0)) * 100} %")
 
     def show_model(self, df: pd.DataFrame):
         """Shows the model and the data in a graph."""

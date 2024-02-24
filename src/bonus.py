@@ -14,16 +14,15 @@ def showDataFrame(df: pd.DataFrame, lfunc: LinearFunction = None):
     plt.figure(figsize=(13, 10))
     plt.plot(km, price, "bo", markersize=15)
 
+    # Add Linear function to plot
     if lfunc is not None:
-        m = lfunc.m
-        b = lfunc.b
         plt.plot(
             km,
-            m * km + b,
+            lfunc.m * km + lfunc.b,
             "r",
             linestyle="-",
             linewidth=4,
-            label=f"y = {m}x + {b}",
+            label=f"y = {lfunc.m}x + {lfunc.b}",
         )
 
     plt.title(
